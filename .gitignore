@@ -1,0 +1,22 @@
+## Visual Studio / .NET build outputs
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+dist/
+publish/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+.vscode/
+
+## SQLite & runtime database files
+*.db
+*.db-shm
+*.db-wal
+
+## Logs
+*.log
+logs/

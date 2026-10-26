@@ -1,0 +1,104 @@
+<UserControl x:Class="NetLanes.App.Views.DiagnosticsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:NetLanes.App.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:DiagnosticsViewModel}"
+             Background="Transparent">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="Auto"/> <!-- Metrics Cards -->
+            <RowDefinition Height="*"/>    <!-- Log Viewer -->
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="System Diagnostics &amp; Engine Logs" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                <TextBlock Text="Live packet interceptor metrics, bounded queue saturation, and Serilog traces." FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="Refresh Metrics" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding RefreshMetricsCommand}" Margin="0,0,8,0"/>
+                <Button Content="📁 Open Logs Folder" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding OpenLogFolderCommand}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- METRICS CARDS -->
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Active Flows -->
+            <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,8,0">
+                <StackPanel>
+                    <TextBlock Text="ACTIVE 5-TUPLE FLOWS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding ActiveFlows}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource PrimaryCyanBrush}" Margin="0,4,0,0"/>
+                    <TextBlock Text="Tracked via IP Helper" FontSize="11" Foreground="{StaticResource TextMutedBrush}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Queued Packets -->
+            <Border Grid.Column="1" Style="{StaticResource CardBorderStyle}" Margin="4,0,4,0">
+                <StackPanel>
+                    <TextBlock Text="BOUNDED QUEUE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding QueuedPackets, StringFormat='{}{0} pkts'}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,4,0,0"/>
+                    <TextBlock Text="{Binding QueuedBytesDisplay, StringFormat='{}Memory: {0}'}" FontSize="11" Foreground="{StaticResource TextMutedBrush}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Bypassed / Overflow -->
+            <Border Grid.Column="2" Style="{StaticResource CardBorderStyle}" Margin="4,0,4,0">
+                <StackPanel>
+                    <TextBlock Text="SAFE OVERFLOW PASS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding BypassedPackets}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AccentAmberBrush}" Margin="0,4,0,0"/>
+                    <TextBlock Text="Prevented connection drops" FontSize="11" Foreground="{StaticResource TextMutedBrush}"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Memory -->
+            <Border Grid.Column="3" Style="{StaticResource CardBorderStyle}" Margin="8,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="PROCESS WORKING SET" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}"/>
+                    <TextBlock Text="{Binding MemoryUsage}" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AccentGreenBrush}" Margin="0,4,0,0"/>
+                    <TextBlock Text="{Binding DriverStatus}" FontSize="10" Foreground="{StaticResource TextMutedBrush}" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- LOG VIEWER -->
+        <Border Grid.Row="2" Style="{StaticResource CardBorderStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <TextBlock Text="Recent Application &amp; Kernel Driver Traces" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                    <Button Content="Refresh Log Lines" Style="{StaticResource SecondaryButtonStyle}" HorizontalAlignment="Right" Padding="8,4" Command="{Binding RefreshLogsCommand}"/>
+                </Grid>
+
+                <ListBox Grid.Row="1" ItemsSource="{Binding RecentLogLines}"
+                         Background="#0F141E"
+                         Foreground="#CBD5E1"
+                         FontFamily="Consolas, Cascadia Code, Courier New"
+                         FontSize="12"
+                         BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

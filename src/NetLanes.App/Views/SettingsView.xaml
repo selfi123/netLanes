@@ -1,0 +1,116 @@
+<UserControl x:Class="NetLanes.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:NetLanes.App.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:SettingsViewModel}"
+             Background="Transparent">
+
+    <ScrollViewer Margin="24" VerticalScrollBarVisibility="Auto">
+        <StackPanel MaxWidth="700" HorizontalAlignment="Left">
+            <!-- HEADER -->
+            <TextBlock Text="Application Settings &amp; Engine Tuning" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+            <TextBlock Text="Configure polling frequency, queue limits, unit displays, and safety margins." FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,24"/>
+
+            <!-- MONITORING CARD -->
+            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Monitoring &amp; Display Preferences" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+
+                    <!-- Refresh Interval -->
+                    <Grid Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Dashboard Refresh Interval (ms)" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Frequency of IP Helper socket sampling and rate updates." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="1" Style="{StaticResource ModernTextBox}" Text="{Binding RefreshIntervalMs, UpdateSourceTrigger=PropertyChanged}" Width="120" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <!-- Default Rate Unit -->
+                    <Grid Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Default Speed Unit" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Unit used when configuring and displaying bandwidth caps." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" Style="{StaticResource ModernComboBox}" ItemsSource="{Binding SupportedUnits}" SelectedItem="{Binding RateUnit}" Width="120" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <!-- Smoothing Factor -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Rate Smoothing Factor (EMA Alpha)" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Values between 0.1 (maximum smoothness) and 1.0 (instantaneous)." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="1" Style="{StaticResource ModernTextBox}" Text="{Binding SmoothingFactor, UpdateSourceTrigger=PropertyChanged}" Width="120" HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- TRAFFIC ENGINE CARD -->
+            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="Traffic Shaping &amp; Memory Safety" FontSize="15" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,12"/>
+
+                    <!-- Safe Overflow -->
+                    <Grid Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Safe Overflow Pass-Through" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="When queue is saturated, pass traffic unthrottled instead of dropping packets." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding SafeOverflowEnabled}" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <!-- Max Packets -->
+                    <Grid Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Bounded Queue Maximum Packets" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Maximum delayed packets buffered in memory per application queue." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="1" Style="{StaticResource ModernTextBox}" Text="{Binding BoundedQueueMaxPackets, UpdateSourceTrigger=PropertyChanged}" Width="120" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <!-- Max Memory (MB) -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Bounded Queue Maximum Memory (MB)" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Maximum RAM allocation for pending delayed packets." FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="1" Style="{StaticResource ModernTextBox}" Text="{Binding BoundedQueueMaxMb, UpdateSourceTrigger=PropertyChanged}" Width="120" HorizontalAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- SAVE BUTTON & TOAST -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource AccentGreenBrush}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                <Button Content="Save Preferences" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveSettingsCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

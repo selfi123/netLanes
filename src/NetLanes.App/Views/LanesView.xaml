@@ -1,0 +1,148 @@
+<UserControl x:Class="NetLanes.App.Views.LanesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:NetLanes.App.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:LanesViewModel}"
+             Background="Transparent">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="Logical Network Lanes" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                <TextBlock Text="Group applications into logical traffic profiles to pace bandwidth consumption safely." FontSize="13" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+            </StackPanel>
+            <Button Grid.Column="1" Content="+ Create New Lane" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding StartAddLaneCommand}" VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- LANES LIST -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- EDIT PANEL (Visible when IsEditing == true) -->
+                <Border Style="{StaticResource CardBorderStyle}" Background="#16202F" BorderBrush="{StaticResource PrimaryCyanBrush}" Margin="0,0,0,20"
+                        Visibility="{Binding IsEditing, Converter={StaticResource BoolToVis}}">
+                    <StackPanel>
+                        <TextBlock Text="Configure Lane" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,14"/>
+
+                        <!-- Lane Name & Description -->
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="Lane Name" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Description" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <TextBox Style="{StaticResource ModernTextBox}" Text="{Binding EditDescription, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Download & Upload Limit -->
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Download Cap -->
+                            <StackPanel Margin="0,0,16,0">
+                                <TextBlock Text="Download Limit" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBox Style="{StaticResource ModernTextBox}" Width="100" Text="{Binding EditDownloadValue, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EditIsUnlimitedDownload, Converter={StaticResource BoolToVisInv}}"/>
+                                    <ComboBox Style="{StaticResource ModernComboBox}" Width="90" Margin="8,0,0,0" ItemsSource="{Binding SupportedUnits}" SelectedItem="{Binding EditDownloadUnit}" IsEnabled="{Binding EditIsUnlimitedDownload, Converter={StaticResource BoolToVisInv}}"/>
+                                </StackPanel>
+                                <CheckBox Content="Unlimited Download" Foreground="{StaticResource TextSecondaryBrush}" IsChecked="{Binding EditIsUnlimitedDownload}"/>
+                            </StackPanel>
+
+                            <!-- Upload Cap -->
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="Upload Limit" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,4"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBox Style="{StaticResource ModernTextBox}" Width="100" Text="{Binding EditUploadValue, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EditIsUnlimitedUpload, Converter={StaticResource BoolToVisInv}}"/>
+                                    <ComboBox Style="{StaticResource ModernComboBox}" Width="90" Margin="8,0,0,0" ItemsSource="{Binding SupportedUnits}" SelectedItem="{Binding EditUploadUnit}" IsEnabled="{Binding EditIsUnlimitedUpload, Converter={StaticResource BoolToVisInv}}"/>
+                                </StackPanel>
+                                <CheckBox Content="Unlimited Upload" Foreground="{StaticResource TextSecondaryBrush}" IsChecked="{Binding EditIsUnlimitedUpload}"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="Cancel" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding CancelEditCommand}" Margin="0,0,8,0"/>
+                            <Button Content="Save Lane" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveEditCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Cards Grid -->
+                <ItemsControl ItemsSource="{Binding Lanes}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource CardBorderStyle}" Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Lane Details -->
+                                    <StackPanel VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <Border Background="#1C2738" CornerRadius="10" Padding="8,2" Margin="10,0,0,0" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding AssignedApplicationCount, StringFormat='{}{0} apps assigned'}" FontSize="11" Foreground="{StaticResource PrimaryCyanBrush}"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Description}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+                                    </StackPanel>
+
+                                    <!-- Rate Limits Display -->
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="24,0">
+                                        <Border Background="#121822" CornerRadius="6" Padding="12,6" Margin="0,0,8,0">
+                                            <StackPanel>
+                                                <TextBlock Text="DOWNLOAD CAP" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}"/>
+                                                <TextBlock Text="{Binding DownloadLimitDisplay}" FontSize="13" FontWeight="Bold" Foreground="{StaticResource PrimaryCyanBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <Border Background="#121822" CornerRadius="6" Padding="12,6">
+                                            <StackPanel>
+                                                <TextBlock Text="UPLOAD CAP" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}"/>
+                                                <TextBlock Text="{Binding UploadLimitDisplay}" FontSize="13" FontWeight="Bold" Foreground="{StaticResource AccentGreenBrush}"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+
+                                    <!-- Action Buttons -->
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Content="Edit" Style="{StaticResource SecondaryButtonStyle}" 
+                                                Command="{Binding DataContext.StartEditLaneCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"
+                                                Margin="0,0,8,0"/>
+                                        <Button Content="Delete" Style="{StaticResource SecondaryButtonStyle}"
+                                                Command="{Binding DataContext.DeleteLaneCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

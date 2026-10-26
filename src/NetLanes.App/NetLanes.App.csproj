@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>NetLanes.App</RootNamespace>
+    <AssemblyName>NetLanes.App</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetLanes.Core\NetLanes.Core.csproj" />
+    <ProjectReference Include="..\NetLanes.Infrastructure\NetLanes.Infrastructure.csproj" />
+    <ProjectReference Include="..\NetLanes.NetworkEngine\NetLanes.NetworkEngine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Native.WinDivert" Version="2.2.2" />
+  </ItemGroup>
+
+</Project>

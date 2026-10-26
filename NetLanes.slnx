@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/NetLanes.App/NetLanes.App.csproj" />
+    <Project Path="src/NetLanes.Core/NetLanes.Core.csproj" />
+    <Project Path="src/NetLanes.Infrastructure/NetLanes.Infrastructure.csproj" />
+    <Project Path="src/NetLanes.NetworkEngine/NetLanes.NetworkEngine.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/NetLanes.Core.Tests/NetLanes.Core.Tests.csproj" />
+    <Project Path="tests/NetLanes.Networking.Tests/NetLanes.Networking.Tests.csproj" />
+  </Folder>
+</Solution>

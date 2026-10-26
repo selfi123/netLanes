@@ -1,0 +1,265 @@
+<UserControl x:Class="NetLanes.App.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:NetLanes.App.ViewModels"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance vm:DashboardViewModel}"
+             Background="Transparent">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Global Metrics & Controls -->
+            <RowDefinition Height="Auto"/> <!-- Elevation / Status Notice -->
+            <RowDefinition Height="Auto"/> <!-- Search & Quick Filter -->
+            <RowDefinition Height="*"/>    <!-- Applications Grid -->
+        </Grid.RowDefinitions>
+
+        <!-- TOP BAR: Global Metrics & Action Controls -->
+        <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Current Global Rates -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Download Rate Card -->
+                    <Border Background="#121822" CornerRadius="8" Padding="16,10" Margin="0,0,16,0" BorderBrush="#253246" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="DOWNLOAD RATE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <TextBlock Text="↓ " FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryCyanBrush}"/>
+                                <TextBlock Text="{Binding FormattedTotalDownloadRate}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Upload Rate Card -->
+                    <Border Background="#121822" CornerRadius="8" Padding="16,10" BorderBrush="#253246" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="UPLOAD RATE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMutedBrush}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <TextBlock Text="↑ " FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentGreenBrush}"/>
+                                <TextBlock Text="{Binding FormattedTotalUploadRate}" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Action Controls -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Monitoring Toggle -->
+                    <Button Content="Start Monitoring"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Command="{Binding StartMonitoringCommand}"
+                            Visibility="{Binding IsMonitoring, Converter={StaticResource BoolToVisInv}}"
+                            Margin="0,0,8,0"/>
+                    <Button Content="Stop Monitoring"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Command="{Binding StopMonitoringCommand}"
+                            Visibility="{Binding IsMonitoring, Converter={StaticResource BoolToVis}}"
+                            Margin="0,0,8,0"/>
+
+                    <!-- Traffic Control Toggle -->
+                    <Button Content="⚡ Enable Traffic Control"
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Command="{Binding EnableControlCommand}"
+                            Visibility="{Binding IsShaping, Converter={StaticResource BoolToVisInv}}"
+                            Margin="0,0,8,0"/>
+                    <Button Content="Disable Control"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Command="{Binding DisableControlCommand}"
+                            Visibility="{Binding IsShaping, Converter={StaticResource BoolToVis}}"
+                            Margin="0,0,8,0"/>
+
+                    <!-- Pause Control -->
+                    <Button Content="Pause"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Command="{Binding PauseControlCommand}"
+                            Visibility="{Binding IsShaping, Converter={StaticResource BoolToVis}}"
+                            Margin="0,0,8,0"/>
+
+                    <!-- Emergency Stop -->
+                    <Button Content="🛑 Emergency Stop"
+                            Style="{StaticResource DangerButtonStyle}"
+                            Command="{Binding EmergencyStopCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ELEVATION REQUIRED BANNER -->
+        <Border Grid.Row="1" Background="#261A0C" BorderBrush="#FF9100" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,0,0,14"
+                Visibility="{Binding IsElevationRequired, Converter={StaticResource BoolToVis}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="🛡️ Administrator Elevation Required for Live Packet Capture &amp; Speed Limiting" FontSize="13" FontWeight="Bold" Foreground="#FFA726"/>
+                    <TextBlock Text="Windows requires Administrator privileges for the WinDivert driver to capture per-application packet throughput and enforce speed limits. Click below to restart NetLanes elevated."
+                               FontSize="12" Foreground="#FFE0B2" Margin="0,3,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="🛡️ Restart as Administrator" 
+                        Style="{StaticResource PrimaryButtonStyle}" 
+                        Background="#FF9100" Foreground="#000000" FontWeight="Bold"
+                        Command="{Binding RestartAsAdministratorCommand}"
+                        VerticalAlignment="Center" Margin="16,0,0,0"/>
+            </Grid>
+        </Border>
+
+        <!-- STATUS BANNER (When elevated) -->
+        <Border Grid.Row="1" Background="#131B28" BorderBrush="#26354A" BorderThickness="1" CornerRadius="6" Padding="12,8" Margin="0,0,0,14"
+                Visibility="{Binding IsElevationRequired, Converter={StaticResource BoolToVisInv}}">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="● " FontWeight="Bold" Foreground="{Binding EnforcementState, Converter={StaticResource StateToBrush}}"/>
+                <TextBlock Text="{Binding StatusSummary}" FontWeight="Medium" Foreground="{StaticResource TextPrimaryBrush}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- SEARCH BAR -->
+        <Grid Grid.Row="2" Margin="0,0,0,12">
+            <TextBox Style="{StaticResource ModernTextBox}"
+                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                     Tag="Search applications by name, executable path, or lane..."
+                     Height="36"/>
+        </Grid>
+
+        <!-- APPLICATIONS LIST -->
+        <Border Grid.Row="3" Style="{StaticResource CardBorderStyle}" Padding="0">
+            <DataGrid ItemsSource="{Binding FilteredApplications}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      CanUserResizeRows="False"
+                      HeadersVisibility="Column"
+                      GridLinesVisibility="Horizontal"
+                      HorizontalGridLinesBrush="#222D3E"
+                      Background="Transparent"
+                      RowBackground="Transparent"
+                      BorderThickness="0"
+                      SelectionMode="Single"
+                      SelectedItem="{Binding SelectedApplication, Mode=TwoWay}"
+                      RowHeight="46"
+                      FontSize="13">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridRow">
+                        <EventSetter Event="PreviewMouseRightButtonDown" Handler="DataGridRow_PreviewMouseRightButtonDown"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#1A263B"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#121824"/>
+                        <Setter Property="Foreground" Value="{StaticResource TextMutedBrush}"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                        <Setter Property="FontSize" Value="11"/>
+                        <Setter Property="Padding" Value="14,10"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                    </Style>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Padding" Value="14,0"/>
+                        <Setter Property="Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="DataGridCell">
+                                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#1A263B"/>
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryCyanBrush}"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Assign to Lane" ItemsSource="{Binding AvailableLanes}">
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                    <Setter Property="Header" Value="{Binding Name}"/>
+                                    <EventSetter Event="Click" Handler="OnLaneMenuItemClick"/>
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="Reset to Unlimited" Click="OnResetToUnlimitedClick"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+
+                <DataGrid.Columns>
+                    <!-- Application Name and Path -->
+                    <DataGridTemplateColumn Header="APPLICATION" Width="2*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="{Binding ExecutablePath}" FontSize="11" Foreground="{StaticResource TextMutedBrush}" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- PID -->
+                    <DataGridTextColumn Header="PID" Binding="{Binding PidDisplay}" Width="100"/>
+
+                    <!-- Download Rate -->
+                    <DataGridTemplateColumn Header="DOWNLOAD" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FormattedDownloadRate}" FontWeight="Bold" Foreground="{StaticResource PrimaryCyanBrush}" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Upload Rate -->
+                    <DataGridTemplateColumn Header="UPLOAD" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FormattedUploadRate}" FontWeight="Bold" Foreground="{StaticResource AccentGreenBrush}" VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Assigned Lane -->
+                    <DataGridTemplateColumn Header="ASSIGNED LANE" Width="140">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border Background="#1C2738" CornerRadius="12" Padding="8,3" HorizontalAlignment="Left">
+                                    <TextBlock Text="{Binding AssignedLaneName}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <!-- Limits Summary -->
+                    <DataGridTextColumn Header="LIMITS" Binding="{Binding LimitsSummary}" Width="150"/>
+
+                    <!-- Enforcement Status -->
+                    <DataGridTemplateColumn Header="STATUS" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" Background="#162235">
+                                    <TextBlock Text="{Binding StatusBadgeText}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource PrimaryCyanBrush}"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl>
